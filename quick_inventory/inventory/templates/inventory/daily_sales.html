@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Продажи за день</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -85,68 +85,35 @@
 </head>
 <body>
     <header>
-        <h1>Quick Inventory Dashboard</h1>
+        <h1>Продажи за {{ date.today }}</h1>
         <a href="{% url 'profile' %}" class="profile-btn">Профиль</a>
     </header>
 
     <div class="container">
-        <!-- Секция товаров -->
+        <!-- Секция продаж -->
         <div class="section">
-            <h2>Список товаров</h2>
+            <h2>Продажи за день</h2>
             <table>
                 <tr>
-                    <th>Название</th>
-                    <th>Категория</th>
-                    <th>Количество</th>
-                    <th>Цена закупки</th>
-                    <th>Цена продажи</th>
-                    <th>Доход с единицы</th>
-                    <th>Действия</th>
-                </tr>
-                {% for product in products %}
-                <tr>
-                    <td>{{ product.name }}</td>
-                    <td>{{ product.category.name }}</td>
-                    <td>{{ product.quantity }}</td>
-                    <td>{{ product.purchase_price }}</td>
-                    <td>{{ product.sale_price }}</td>
-                    <td>{{ product.product_income }}</td>
-                    <td class="actions">
-                        <a href="{% url 'edit_product' product.pk %}">Редактировать</a>
-                        <a href="#">Удалить</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-            <a href="{% url 'add_product' %}" class="add-btn">Добавить товар</a>
-        </div>
-
-        <!-- Секция транзакций -->
-        <div class="section">
-            <h2>Недавние транзакции</h2>
-            <table>
-                <tr>
-                    <th>Тип</th>
                     <th>Товар</th>
                     <th>Количество</th>
-                    <th>Дата</th>
+                    <th>Общая сумма</th>
+                    <th>Прибыль</th>
                 </tr>
-                {% for transaction in transactions %}
+                {% for sale in sales %}
                 <tr>
-                    <td>{{ transaction.get_transaction_type_display }}</td>
-                    <td>{{ transaction.product.name }}</td>
-                    <td>{{ transaction.quantity }}</td>
-                    <td>{{ transaction.timestamp }}</td>
+                    <td>{{ sale.product.name }}</td>
+                    <td>{{ sale.quantity }}</td>
+                    <td>{{ sale.total_price }}</td>
+                    <td>{{ sale.profit }}</td>
                 </tr>
                 {% endfor %}
             </table>
+
+            <h2>Итоги за день</h2>
+            <p><strong>Общий доход:</strong> {{ total_income }}</p>
+            <p><strong>Чистая прибыль:</strong> {{ total_profit }}</p>
         </div>
     </div>
-    <!-- Кнопка для перехода на страницу дневных продаж -->
-<div class="container">
-    <a href="{% url 'daily_sales' %}" class="add-btn">Дневные продажи</a>
-</div>
-
 </body>
 </html>
-

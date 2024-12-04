@@ -1,5 +1,6 @@
+from datetime import date
 from django.shortcuts import render
-from .models import Product, Transaction
+from .models import DailySale, Product, Transaction
 
 def dashboard(request):
     products = Product.objects.all()
@@ -71,6 +72,45 @@ from django.shortcuts import render
 
 def profile(request):
     return render(request, 'inventory/profile.html')
+
+
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+from django.utils.timezone import now
+
+def daily_sales(request):
+    today = date.today()
+
+    # Получаем продажи за текущий день
+    sales = DailySale.objects.filter(sale_date=today)
+
+    # Считаем общий доход и чистую прибыль
+    total_income = sales.aggregate(Sum('total_price'))['total_price__sum'] or 0
+    total_profit = sales.aggregate(
+        total_profit=Sum(
+            ExpressionWrapper(
+                F('quantity') * (F('product__sale_price') - F('product__purchase_price')),
+                output_field=DecimalField(max_digits=10, decimal_places=2)
+            )
+        )
+    )['total_profit'] or 0
+
+    return render(request, 'inventory/daily_sales.html', {
+        'sales': sales,
+        'total_income': total_income,
+        'total_profit': total_profit,
+    })
+
+
+
+def close_day(request):
+    sales = DailySale.objects.filter(sale_date=now().date())
+    total_income = sales.aggregate(total=Sum(F('quantity') * F('product__sale_price')))['total'] or 0
+    return render(request, 'inventory/close_day.html', {
+        'sales': sales,
+        'total_income': total_income,
+    })
+
+
 
 
 

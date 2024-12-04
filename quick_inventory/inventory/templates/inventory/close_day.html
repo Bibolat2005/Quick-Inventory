@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чек за день</title>
+</head>
+<body>
+    <h1>Чек за день</h1>
+
+    <table>
+        <tr>
+            <th>Товар</th>
+            <th>Количество</th>
+            <th>Общая сумма</th>
+        </tr>
+        {% for sale in sales %}
+        <tr>
+            <td>{{ sale.product.name }}</td>
+            <td>{{ sale.quantity }}</td>
+            <td>{{ sale.total_price }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p><strong>Итоговый доход:</strong> {{ total_income }}</p>
+</body>
+</html>

@@ -10,4 +10,6 @@ urlpatterns = [
     path('transactions/', views.transaction_list, name='transaction_list'),
     path('profile/', views.profile, name='profile'),  # маршрут для профиля
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('daily-sales/', views.daily_sales, name='daily_sales'),
+    path('close-day/', views.close_day, name='close_day'),
 ]

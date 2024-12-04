@@ -43,3 +43,23 @@ class CustomUser(AbstractUser):
         ('seller', 'Seller'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='seller')
+
+
+from django.db import models
+from django.utils.timezone import now
+
+class DailySale(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    sale_date = models.DateField(default=now)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    @property
+    def profit(self):
+        """Чистая прибыль для данной продажи"""
+        return self.quantity * (self.product.sale_price - self.product.purchase_price)
+
+    def __str__(self):
+        return f"{self.product.name} - {self.quantity} sold on {self.sale_date}"
+
+
