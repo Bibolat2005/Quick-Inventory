@@ -12,4 +12,5 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('daily-sales/', views.daily_sales, name='daily_sales'),
     path('close-day/', views.close_day, name='close_day'),
+    path('closed_day/<int:closed_day_id>/', views.closed_day_detail, name='closed_day_detail'),
 ]

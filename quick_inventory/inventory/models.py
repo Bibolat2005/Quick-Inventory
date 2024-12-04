@@ -44,6 +44,18 @@ class CustomUser(AbstractUser):
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='seller')
 
+    
+from django.db import models
+from django.utils.timezone import now
+
+class ClosedDay(models.Model):
+    date = models.DateField(default=now)
+    total_income = models.DecimalField(max_digits=10, decimal_places=2)
+    total_profit = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Закрытие дня: {self.date} - Доход: {self.total_income} - Прибыль: {self.total_profit}"
+    
 
 from django.db import models
 
@@ -52,9 +64,11 @@ class DailySale(models.Model):
     quantity = models.PositiveIntegerField()
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     sale_date = models.DateField()
-    
+    closed_day = models.ForeignKey(ClosedDay, on_delete=models.CASCADE, null=True, blank=True)  # Добавляем связь
+
     def __str__(self):
         return f'{self.product.name} - {self.quantity} sold'
+
 
 
 
