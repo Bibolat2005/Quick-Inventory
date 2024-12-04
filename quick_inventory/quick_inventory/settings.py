@@ -123,4 +123,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'inventory.CustomUser'
+LOGOUT_REDIRECT_URL = '/'  # Перенаправление на главную страницу после выхода
 

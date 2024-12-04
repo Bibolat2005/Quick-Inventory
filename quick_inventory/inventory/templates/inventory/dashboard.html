@@ -16,6 +16,23 @@
             color: white;
             padding: 15px;
             text-align: center;
+            position: relative;
+        }
+        header .profile-btn {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            background-color: white;
+            color: #007BFF;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        header .profile-btn:hover {
+            background-color: #e6e6e6;
         }
         h1, h2 {
             color: #333;
@@ -69,6 +86,7 @@
 <body>
     <header>
         <h1>Quick Inventory Dashboard</h1>
+        <a href="{% url 'profile' %}" class="profile-btn">Профиль</a>
     </header>
 
     <div class="container">
@@ -126,3 +144,4 @@
     </div>
 </body>
 </html>
+

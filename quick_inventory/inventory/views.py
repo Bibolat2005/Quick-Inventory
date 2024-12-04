@@ -67,5 +67,11 @@ def transaction_list(request):
     transactions = Transaction.objects.all()
     return render(request, 'inventory/transaction_list.html', {'transactions': transactions})
 
+from django.shortcuts import render
+
+def profile(request):
+    return render(request, 'inventory/profile.html')
+
+
 
 
