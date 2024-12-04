@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .container {
+            width: 90%;
+            margin: auto;
+            padding: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        .actions a {
+            text-decoration: none;
+            color: #007BFF;
+            margin-right: 10px;
+        }
+        .actions a:hover {
+            text-decoration: underline;
+        }
+        .add-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .add-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Quick Inventory Dashboard</h1>
+    </header>
+
+    <div class="container">
+        <!-- Секция товаров -->
+        <div class="section">
+            <h2>Список товаров</h2>
+            <table>
+                <tr>
+                    <th>Название</th>
+                    <th>Категория</th>
+                    <th>Количество</th>
+                    <th>Цена закупки</th>
+                    <th>Цена продажи</th>
+                    <th>Доход с единицы</th>
+                    <th>Действия</th>
+                </tr>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.category.name }}</td>
+                    <td>{{ product.quantity }}</td>
+                    <td>{{ product.purchase_price }}</td>
+                    <td>{{ product.sale_price }}</td>
+                    <td>{{ product.product_income }}</td>
+                    <td class="actions">
+                        <a href="{% url 'edit_product' product.pk %}">Редактировать</a>
+                        <a href="#">Удалить</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <a href="{% url 'add_product' %}" class="add-btn">Добавить товар</a>
+        </div>
+
+        <!-- Секция транзакций -->
+        <div class="section">
+            <h2>Недавние транзакции</h2>
+            <table>
+                <tr>
+                    <th>Тип</th>
+                    <th>Товар</th>
+                    <th>Количество</th>
+                    <th>Дата</th>
+                </tr>
+                {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction.get_transaction_type_display }}</td>
+                    <td>{{ transaction.product.name }}</td>
+                    <td>{{ transaction.quantity }}</td>
+                    <td>{{ transaction.timestamp }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</body>
+</html>

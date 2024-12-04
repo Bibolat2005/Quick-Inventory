@@ -1,0 +1,22 @@
+<h1>Список товаров</h1>
+<table>
+    <tr>
+        <th>Название</th>
+        <th>Категория</th>
+        <th>Количество</th>
+        <th>Цена продажи</th>
+        <th>Действия</th>
+    </tr>
+    {% for product in products %}
+    <tr>
+        <td>{{ product.name }}</td>
+        <td>{{ product.category }}</td>
+        <td>{{ product.quantity }}</td>
+        <td>{{ product.sale_price }}</td>
+        <td>
+            <a href="{% url 'edit_product' product.pk %}">Редактировать</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<a href="{% url 'add_product' %}">Добавить товар</a>

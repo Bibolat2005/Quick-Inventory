@@ -1,0 +1,17 @@
+<h1>Список транзакций</h1>
+<table>
+    <tr>
+        <th>Тип</th>
+        <th>Товар</th>
+        <th>Количество</th>
+        <th>Дата и время</th>
+    </tr>
+    {% for transaction in transactions %}
+    <tr>
+        <td>{{ transaction.get_transaction_type_display }}</td>
+        <td>{{ transaction.product.name }}</td>
+        <td>{{ transaction.quantity }}</td>
+        <td>{{ transaction.timestamp }}</td>
+    </tr>
+    {% endfor %}
+</table>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить товар</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #007BFF;
+            text-align: center;
+            display: block;
+        }
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Добавить товар</h1>
+    </header>
+    <div class="container">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Название товара</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="category">Категория</label>
+                <select id="category" name="category" required>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="quantity">Количество</label>
+                <input type="number" id="quantity" name="quantity" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="purchase_price">Цена закупки</label>
+                <input type="number" id="purchase_price" name="purchase_price" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="sale_price">Цена продажи</label>
+                <input type="number" id="sale_price" name="sale_price" step="0.01" min="0" required>
+            </div>
+            <button type="submit">Добавить</button>
+        </form>
+        <a href="{% url 'dashboard' %}" class="back-btn">Вернуться на Dashboard</a>
+    </div>
+</body>
+</html>
