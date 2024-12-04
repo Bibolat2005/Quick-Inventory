@@ -62,6 +62,9 @@
             background-color: #007BFF;
             color: white;
         }
+        #close-day-btn{
+            background-color: rgb(170, 0, 0);
+        }
         .actions a {
             text-decoration: none;
             color: #007BFF;
@@ -126,7 +129,7 @@
         <p><strong>Чистая прибыль:</strong> {{ total_profit }}</p>
 
         <!-- Кнопка завершения дня -->
-        <a href="{% url 'close_day' %}" class="add-btn">Закончить день</a>
+        <a href="{% url 'close_day' %}" class="add-btn" id="close-day-btn">Закончить день</a>
     </div>
 </body>
 </html>
