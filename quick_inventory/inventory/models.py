@@ -59,15 +59,20 @@ class ClosedDay(models.Model):
 
 from django.db import models
 
+from django.db import models
+
 class DailySale(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
     sale_date = models.DateField()
-    closed_day = models.ForeignKey(ClosedDay, on_delete=models.CASCADE, null=True, blank=True)  # Добавляем связь
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    is_closed = models.BooleanField(default=False)
+    closed_day = models.ForeignKey('ClosedDay', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.product.name} - {self.quantity} sold'
+        return f"Sale of {self.product.name} on {self.sale_date}"
+
+
 
 
 

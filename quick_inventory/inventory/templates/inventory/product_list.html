@@ -4,17 +4,22 @@
         <th>Название</th>
         <th>Категория</th>
         <th>Количество</th>
+        <th>Цена закупки</th>
         <th>Цена продажи</th>
+        <th>Доход с единицы</th>
         <th>Действия</th>
     </tr>
     {% for product in products %}
     <tr>
         <td>{{ product.name }}</td>
-        <td>{{ product.category }}</td>
-        <td>{{ product.quantity }}</td>
-        <td>{{ product.sale_price }}</td>
+                    <td>{{ product.category.name }}</td>
+                    <td>{{ product.quantity }}</td>
+                    <td>{{ product.purchase_price }}</td>
+                    <td>{{ product.sale_price }}</td>
+                    <td>{{ product.product_income }}</td>
         <td>
             <a href="{% url 'edit_product' product.pk %}">Редактировать</a>
+            <a href="#">Удалить</a>
         </td>
     </tr>
     {% endfor %}

@@ -84,10 +84,16 @@ from .models import Product, DailySale
 from .forms import DailySaleForm
 from django.utils.timezone import now
 
+from django.shortcuts import render
+from django.utils.timezone import now
+from .models import DailySale
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+
+
 def daily_sales(request):
     today = now().date()  # Текущая дата
 
-    # Получаем все продажи за текущий день
+    # Фильтруем продажи по сегодняшней дате
     sales = DailySale.objects.filter(sale_date=today)
 
     # Обработка формы при добавлении продажи
@@ -95,7 +101,7 @@ def daily_sales(request):
         form = DailySaleForm(request.POST)
         if form.is_valid():
             sale = form.save(commit=False)
-            sale.sale_date = today
+            sale.sale_date = today  # Устанавливаем сегодняшнюю дату
             sale.total_price = sale.quantity * sale.product.sale_price  # Считаем общую сумму продажи
             sale.save()
 
@@ -113,7 +119,7 @@ def daily_sales(request):
         form = DailySaleForm()
 
     # Считаем итоговые доходы и прибыль
-    total_income = sales.aggregate(Sum('total_price'))['total_price__sum'] or 0
+    total_income = sales.aggregate(total_income=Sum(F('quantity') * F('product__sale_price')))['total_income'] or 0
     total_profit = sales.aggregate(
         total_profit=Sum(
             ExpressionWrapper(
@@ -130,6 +136,7 @@ def daily_sales(request):
         'form': form,
         'today': today,  # Добавляем текущую дату в контекст
     })
+
 
 
 
@@ -203,13 +210,17 @@ def close_day(request):
         total_profit=total_profit
     )
 
-    # Обновляем продажи, добавляя связь с ClosedDay
-    sales.update(closed_day=closed_day)
+    # Обновляем продажи, добавляя связь с ClosedDay и помечаем их как закрытые
+    sales.update(closed_day=closed_day, is_closed=True)
+
+    # Обновляем количество товара в модели Product
+    for sale in sales:
+        product = sale.product
+        product.quantity -= sale.quantity  # Уменьшаем количество товара
+        product.save()
 
     # Перенаправляем на страницу, где отображаются закрытые дни
     return redirect('dashboard')
-
-
 
 
 
@@ -237,6 +248,24 @@ def closed_day_detail(request, closed_day_id):
         'total_income': total_income,
         'total_profit': total_profit,
     })
+
+from django.shortcuts import get_object_or_404, redirect
+from .models import DailySale
+
+def delete_sale(request, sale_id):
+    # Получаем продажу по ID
+    sale = get_object_or_404(DailySale, id=sale_id)
+    
+    # Увеличиваем количество товара в модели Product (возвращаем товар на склад)
+    product = sale.product
+    product.quantity += sale.quantity
+    product.save()
+
+    # Удаляем продажу
+    sale.delete()
+
+    # Перенаправляем на страницу с продажами
+    return redirect('daily_sales')
 
 
 
