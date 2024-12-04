@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Продажи за день</title>
     <style>
+        /* Стиль как в dashboard.html */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -85,35 +86,42 @@
 </head>
 <body>
     <header>
-        <h1>Продажи за {{ date.today }}</h1>
+        <h1>Дневные продажи за {{ today }}</h1>
         <a href="{% url 'profile' %}" class="profile-btn">Профиль</a>
     </header>
 
     <div class="container">
-        <!-- Секция продаж -->
-        <div class="section">
-            <h2>Продажи за день</h2>
-            <table>
-                <tr>
-                    <th>Товар</th>
-                    <th>Количество</th>
-                    <th>Общая сумма</th>
-                    <th>Прибыль</th>
-                </tr>
-                {% for sale in sales %}
-                <tr>
-                    <td>{{ sale.product.name }}</td>
-                    <td>{{ sale.quantity }}</td>
-                    <td>{{ sale.total_price }}</td>
-                    <td>{{ sale.profit }}</td>
-                </tr>
-                {% endfor %}
-            </table>
+        <!-- Форма для добавления продаж -->
+        <h2>Добавить продажу</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="add-btn">Добавить продажу</button>
+        </form>
 
-            <h2>Итоги за день</h2>
-            <p><strong>Общий доход:</strong> {{ total_income }}</p>
-            <p><strong>Чистая прибыль:</strong> {{ total_profit }}</p>
-        </div>
+        <!-- Список проданных товаров -->
+        <h2>Продажи за день</h2>
+        <table>
+            <tr>
+                <th>Товар</th>
+                <th>Количество</th>
+                <th>Общая сумма</th>
+            </tr>
+            {% for sale in sales %}
+            <tr>
+                <td>{{ sale.product.name }}</td>
+                <td>{{ sale.quantity }}</td>
+                <td>{{ sale.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h2>Итоги за день</h2>
+        <p><strong>Общий доход:</strong> {{ total_income }}</p>
+        <p><strong>Чистая прибыль:</strong> {{ total_profit }}</p>
+
+        <!-- Кнопка завершения дня -->
+        <a href="{% url 'close_day' %}" class="add-btn">Закончить день</a>
     </div>
 </body>
 </html>

@@ -46,20 +46,16 @@ class CustomUser(AbstractUser):
 
 
 from django.db import models
-from django.utils.timezone import now
 
 class DailySale(models.Model):
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    sale_date = models.DateField(default=now)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-
-    @property
-    def profit(self):
-        """Чистая прибыль для данной продажи"""
-        return self.quantity * (self.product.sale_price - self.product.purchase_price)
-
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    sale_date = models.DateField()
+    
     def __str__(self):
-        return f"{self.product.name} - {self.quantity} sold on {self.sale_date}"
+        return f'{self.product.name} - {self.quantity} sold'
+
+
 
 

@@ -9,7 +9,7 @@ def dashboard(request):
 
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Product
-from .forms import ProductForm
+from .forms import DailySaleForm, ProductForm
 
 def product_list(request):
     products = Product.objects.all()
@@ -74,16 +74,31 @@ def profile(request):
     return render(request, 'inventory/profile.html')
 
 
+from datetime import date
+from django.shortcuts import render
+from .models import DailySale
 from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 from django.utils.timezone import now
 
 def daily_sales(request):
-    today = date.today()
+    today = date.today()  # Текущая дата
 
-    # Получаем продажи за текущий день
+    # Получаем все продажи за текущий день
     sales = DailySale.objects.filter(sale_date=today)
 
-    # Считаем общий доход и чистую прибыль
+    # Обработка формы при добавлении продажи
+    if request.method == 'POST':
+        form = DailySaleForm(request.POST)
+        if form.is_valid():
+            sale = form.save(commit=False)
+            sale.sale_date = today
+            sale.total_price = sale.quantity * sale.product.sale_price  # Считаем общую сумму продажи
+            sale.save()
+            return redirect('daily_sales')  # Перезагружаем страницу, чтобы увидеть обновления
+    else:
+        form = DailySaleForm()
+
+    # Считаем итоговые доходы и прибыль
     total_income = sales.aggregate(Sum('total_price'))['total_price__sum'] or 0
     total_profit = sales.aggregate(
         total_profit=Sum(
@@ -98,17 +113,48 @@ def daily_sales(request):
         'sales': sales,
         'total_income': total_income,
         'total_profit': total_profit,
+        'form': form,
+        'today': today,  # Добавляем текущую дату в контекст
     })
 
 
 
+
+from django.shortcuts import render
+from .models import DailySale
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+from django.utils.timezone import now
+
 def close_day(request):
-    sales = DailySale.objects.filter(sale_date=now().date())
+    today = now().date()  # Текущая дата
+
+    # Получаем все продажи за сегодняшний день
+    sales = DailySale.objects.filter(sale_date=today)
+
+    # Считаем общий доход за день
     total_income = sales.aggregate(total=Sum(F('quantity') * F('product__sale_price')))['total'] or 0
+
+    total_profit = sales.aggregate(
+        total_profit=Sum(
+            ExpressionWrapper(
+                F('quantity') * (F('product__sale_price') - F('product__purchase_price')),
+                output_field=DecimalField(max_digits=10, decimal_places=2)
+            )
+        )
+    )['total_profit'] or 0
+
+    # Подготавливаем итоговый список проданных товаров
+    sold_products = sales.values('product__name').annotate(total_quantity=Sum('quantity'))
+
     return render(request, 'inventory/close_day.html', {
         'sales': sales,
         'total_income': total_income,
+        'total_profit': total_profit,
+        'sold_products': sold_products,
+        'today': today,  # Добавляем текущую дату в контекст
     })
+
+
 
 
 

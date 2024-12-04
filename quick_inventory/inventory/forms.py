@@ -8,19 +8,15 @@ class ProductForm(forms.ModelForm):
 
 
 from django import forms
-from .models import Product, DailySale
+from .models import DailySale, Product
 
 class DailySaleForm(forms.ModelForm):
     class Meta:
         model = DailySale
         fields = ['product', 'quantity']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['product'].queryset = Product.objects.all()  # Все товары для выбора
 
-    def clean_quantity(self):
-        quantity = self.cleaned_data['quantity']
-        product = self.cleaned_data['product']
-
-        if quantity > product.quantity:
-            raise forms.ValidationError(f"Недостаточно товара {product.name} на складе.")
-
-        return quantity
 
