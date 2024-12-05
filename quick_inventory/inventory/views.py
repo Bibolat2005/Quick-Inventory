@@ -9,7 +9,6 @@ from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 from django.utils.timezone import now
 from datetime import timedelta
 
-
 def dashboard(request):
     # Существующие данные
     products = Product.objects.all()
@@ -45,6 +44,10 @@ def dashboard(request):
 from django.shortcuts import render
 from .models import Product, Category
 
+from django.contrib.auth.decorators import login_required
+from .decorators import manager_only
+@login_required
+@manager_only
 def product_list(request):
     category_id = request.GET.get('category')
     categories = Category.objects.all()
@@ -65,6 +68,8 @@ from .forms import ProductForm
 from django.shortcuts import render, redirect
 from .models import Category, Product
 
+@login_required
+@manager_only
 def add_product(request):
     if request.method == 'POST':
         name = request.POST['name']
@@ -178,45 +183,6 @@ def daily_sales(request):
     })
 
 
-
-
-
-
-from django.shortcuts import render
-from .models import DailySale
-from django.db.models import Sum, F, ExpressionWrapper, DecimalField
-from django.utils.timezone import now
-
-def close_day(request):
-    today = now().date()  # Текущая дата
-
-    # Получаем все продажи за сегодняшний день
-    sales = DailySale.objects.filter(sale_date=today)
-
-    # Считаем общий доход за день
-    total_income = sales.aggregate(total=Sum(F('quantity') * F('product__sale_price')))['total'] or 0
-
-    total_profit = sales.aggregate(
-        total_profit=Sum(
-            ExpressionWrapper(
-                F('quantity') * (F('product__sale_price') - F('product__purchase_price')),
-                output_field=DecimalField(max_digits=10, decimal_places=2)
-            )
-        )
-    )['total_profit'] or 0
-
-    # Подготавливаем итоговый список проданных товаров
-    sold_products = sales.values('product__name').annotate(total_quantity=Sum('quantity'))
-
-    return render(request, 'inventory/close_day.html', {
-        'sales': sales,
-        'total_income': total_income,
-        'total_profit': total_profit,
-        'sold_products': sold_products,
-        'today': today,  # Добавляем текущую дату в контекст
-    })
-
-
 from django.shortcuts import redirect
 from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 from django.utils.timezone import now
@@ -306,3 +272,33 @@ def delete_sale(request, sale_id):
 
     # Перенаправляем на страницу с продажами
     return redirect('daily_sales')
+
+from django.contrib.auth import login, authenticate
+from django.shortcuts import render, redirect
+from .forms import UserRegistrationForm
+from django.contrib.auth.decorators import login_required
+
+def signup(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # Авторизуем пользователя после регистрации
+            return redirect('dashboard')
+    else:
+        form = UserRegistrationForm()
+    return render(request, 'inventory/signup.html', {'form': form})
+
+from django.contrib.auth.forms import AuthenticationForm
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            # Вход пользователя
+            login(request, form.get_user())
+            return redirect('dashboard')
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'inventory/login.html', {'form': form})

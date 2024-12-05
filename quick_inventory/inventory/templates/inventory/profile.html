@@ -84,7 +84,11 @@
             <p><strong>Роль:</strong> {{ user.role }}</p>
         </div>
 
-        <a href="{% url 'logout' %}" class="button">Выйти</a>
+        <form method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="button">Выйти</button>
+        </form>
+        
     </div>
 
     <div class="footer">
