@@ -1,4 +1,18 @@
 <h1>Список товаров</h1>
+<div>
+    <a href="{% url 'dashboard' %}" class="dashboard-btn">Перейти в Dashboard</a>
+</div>
+<form method="get" action="">
+    <label for="category-filter">Фильтр по категории:</label>
+    <select name="category" id="category-filter" onchange="this.form.submit()">
+        <option value="">Все категории</option>
+        {% for category in categories %}
+        <option value="{{ category.id }}" {% if category.id|stringformat:"s" == request.GET.category %}selected{% endif %}>
+            {{ category.name }}
+        </option>
+        {% endfor %}
+    </select>
+</form>
 <table>
     <tr>
         <th>Название</th>
@@ -12,11 +26,11 @@
     {% for product in products %}
     <tr>
         <td>{{ product.name }}</td>
-                    <td>{{ product.category.name }}</td>
-                    <td>{{ product.quantity }}</td>
-                    <td>{{ product.purchase_price }}</td>
-                    <td>{{ product.sale_price }}</td>
-                    <td>{{ product.product_income }}</td>
+        <td>{{ product.category.name }}</td>
+        <td>{{ product.quantity }}</td>
+        <td>{{ product.purchase_price }}</td>
+        <td>{{ product.sale_price }}</td>
+        <td>{{ product.product_income }}</td>
         <td>
             <a href="{% url 'edit_product' product.pk %}">Редактировать</a>
             <a href="#">Удалить</a>
@@ -25,6 +39,8 @@
     {% endfor %}
 </table>
 <a href="{% url 'add_product' %}" class="add-btn">Добавить товар</a>
+
+
 
 <style>
     body {
@@ -66,6 +82,20 @@
         background-color: #007BFF;
         color: white;
     }
+    .dashboard-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+    .dashboard-btn:hover {
+    background-color: #0056b3;
+    }
+
     .actions a {
         text-decoration: none;
         color: #007BFF;

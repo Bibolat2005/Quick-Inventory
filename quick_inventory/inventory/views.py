@@ -5,20 +5,60 @@ from .models import DailySale, Product, Transaction
 from django.shortcuts import render
 from .models import ClosedDay, Product, Transaction
 
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+from django.utils.timezone import now
+from datetime import timedelta
+
+
 def dashboard(request):
+    # Существующие данные
     products = Product.objects.all()
     transactions = Transaction.objects.all()
-    closed_days = ClosedDay.objects.all()  # Получаем все закрытые дни
-    return render(request, 'inventory/dashboard.html', {'products': products, 'transactions': transactions, 'closed_days': closed_days})
+    closed_days = ClosedDay.objects.all()
+
+    # Вычисление доходов, расходов и прибыли за текущий месяц
+    today = now().date()
+    start_of_month = today.replace(day=1)  # Первое число текущего месяца
+    end_of_month = (today.replace(day=1) + timedelta(days=31)).replace(day=1) - timedelta(days=1)  # Последний день месяца
+
+    # Продажи за текущий месяц
+    sales = DailySale.objects.filter(sale_date__range=(start_of_month, end_of_month))
+
+    # Расчет данных
+    total_income = sales.aggregate(total_income=Sum(F('quantity') * F('product__sale_price')))['total_income'] or 0
+    total_expenses = sales.aggregate(total_expenses=Sum(F('quantity') * F('product__purchase_price')))['total_expenses'] or 0
+    total_profit = total_income - total_expenses
+
+    # Передача всех данных в контекст
+    context = {
+        'products': products,
+        'transactions': transactions,
+        'closed_days': closed_days,
+        'total_income': total_income,
+        'total_expenses': total_expenses,
+        'total_profit': total_profit,
+    }
+
+    return render(request, 'inventory/dashboard.html', context)
 
 
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product
-from .forms import DailySaleForm, ProductForm
+from django.shortcuts import render
+from .models import Product, Category
 
 def product_list(request):
-    products = Product.objects.all()
-    return render(request, 'inventory/product_list.html', {'products': products})
+    category_id = request.GET.get('category')
+    categories = Category.objects.all()
+    
+    if category_id:
+        products = Product.objects.filter(category_id=category_id)
+    else:
+        products = Product.objects.all()
+    
+    return render(request, 'inventory/product_list.html', {
+        'products': products,
+        'categories': categories,
+    })
+
 
 from .forms import ProductForm
 
@@ -266,17 +306,3 @@ def delete_sale(request, sale_id):
 
     # Перенаправляем на страницу с продажами
     return redirect('daily_sales')
-
-
-
-
-
-
-
-
-
-
-
-
-
-

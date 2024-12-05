@@ -186,6 +186,36 @@
         .footer a:hover {
             text-decoration: underline;
         }
+        .summary-section {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .summary-section h2 {
+        margin-bottom: 20px;
+    }
+
+    .summary-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .summary-table th, .summary-table td {
+        text-align: left;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .summary-table th {
+        font-weight: bold;
+    }
+
+    .summary-table td {
+        font-size: 1.1em;
+    }
     </style>
 </head>
 <body>
@@ -232,6 +262,25 @@
             </ul>
         </div>
     </div>
+
+    <div class="summary-section">
+        <h2>Итоги за месяц</h2>
+        <table class="summary-table">
+            <tr>
+                <th>Доход:</th>
+                <td>{{ total_income|floatformat:2 }} ₸</td>
+            </tr>
+            <tr>
+                <th>Расход:</th>
+                <td>{{ total_expenses|floatformat:2 }} ₸</td>
+            </tr>
+            <tr>
+                <th>Чистая прибыль:</th>
+                <td>{{ total_profit|floatformat:2 }} ₸</td>
+            </tr>
+        </table>
+    </div>
+    
 
     <div class="footer">
         <p>© 2024 Quick Inventory. Все права защищены.</p>
