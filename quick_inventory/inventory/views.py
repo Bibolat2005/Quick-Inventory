@@ -10,25 +10,19 @@ from django.utils.timezone import now
 from datetime import timedelta
 
 def dashboard(request):
-    # Существующие данные
     products = Product.objects.all()
     transactions = Transaction.objects.all()
     closed_days = ClosedDay.objects.all()
 
-    # Вычисление доходов, расходов и прибыли за текущий месяц
     today = now().date()
-    start_of_month = today.replace(day=1)  # Первое число текущего месяца
-    end_of_month = (today.replace(day=1) + timedelta(days=31)).replace(day=1) - timedelta(days=1)  # Последний день месяца
-
-    # Продажи за текущий месяц
+    start_of_month = today.replace(day=1)
+    end_of_month = (today.replace(day=1) + timedelta(days=31)).replace(day=1) - timedelta(days=1) 
     sales = DailySale.objects.filter(sale_date__range=(start_of_month, end_of_month))
 
-    # Расчет данных
     total_income = sales.aggregate(total_income=Sum(F('quantity') * F('product__sale_price')))['total_income'] or 0
     total_expenses = sales.aggregate(total_expenses=Sum(F('quantity') * F('product__purchase_price')))['total_expenses'] or 0
     total_profit = total_income - total_expenses
 
-    # Передача всех данных в контекст
     context = {
         'products': products,
         'transactions': transactions,
